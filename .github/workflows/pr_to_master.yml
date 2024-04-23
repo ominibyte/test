@@ -30,6 +30,12 @@ jobs:
             automerge
             automated pr
           branch-suffix: short-commit-hash
+          delete-branch: true
+      - name: Auto approve
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
       - name: Enable Pull Request Automerge
         if: ${{ steps.cpr.outputs.pull-request-number }}
         run: gh pr merge --merge --auto "${{ steps.cpr.outputs.pull-request-number }}"
