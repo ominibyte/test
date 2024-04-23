@@ -1,0 +1,37 @@
+name: Create PR to Master
+
+on:
+  pull_request:
+    branches:
+      - development
+    types:
+      - closed
+
+jobs:
+  on-merge-to-development:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Prepare
+        run: |
+          git fetch origin development:development
+          git reset --hard development
+          sed -i 's/0987654321/1234567890/g' Connections.json
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          commit-message: Reset main after merge
+          labels: |
+            automerge
+            automated pr
+          branch-suffix: short-commit-hash
+      - name: Enable Pull Request Automerge
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: gh pr merge --merge --auto "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
