@@ -1,0 +1,30 @@
+name: Create PR to Master
+
+on:
+  pull_request:
+    branches:
+      - development
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare
+        run: |
+          sed 's/0987654321/1234567890/' Connections.json
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          add-paths: |
+            .gitattributes
+            Connections.json
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          commit-message: Reset main after merge
+          labels: |
+            automerge
+            automated pr
+          base: main
