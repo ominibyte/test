@@ -13,8 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Prepare
         run: |
+          git fetch origin development:development
+          git reset --hard development
           sed 's/0987654321/1234567890/' Connections.json
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
@@ -24,5 +28,4 @@ jobs:
           labels: |
             automerge
             automated pr
-          base: main
           branch-suffix: short-commit-hash
