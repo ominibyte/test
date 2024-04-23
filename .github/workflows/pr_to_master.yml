@@ -8,7 +8,7 @@ on:
       - closed
 
 jobs:
-  if_merged:
+  on-merge-to-development:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
@@ -27,4 +27,5 @@ jobs:
           labels: |
             automerge
             automated pr
-          base: main
+          base: origin/main
+          branch-suffix: short-commit-hash
