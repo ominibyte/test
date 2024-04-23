@@ -19,13 +19,10 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          add-paths: |
-            .gitattributes
-            Connections.json
           token: ${{ secrets.WORKFLOW_TOKEN }}
           commit-message: Reset main after merge
           labels: |
             automerge
             automated pr
-          base: origin/main
+          base: main
           branch-suffix: short-commit-hash
