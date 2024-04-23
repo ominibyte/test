@@ -11,6 +11,9 @@ jobs:
   on-merge-to-development:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,12 +27,18 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: Reset main after merge
           labels: |
             automerge
             automated pr
           branch-suffix: short-commit-hash
+          delete-branch: true
+      - name: Auto approve
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: gh pr review --approve "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
       - name: Enable Pull Request Automerge
         if: ${{ steps.cpr.outputs.pull-request-number }}
         run: gh pr merge --merge --auto "${{ steps.cpr.outputs.pull-request-number }}"
